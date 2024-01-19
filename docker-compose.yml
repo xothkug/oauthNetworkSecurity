@@ -1,0 +1,73 @@
+version: "3.8"
+
+services:
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker"
+      - "--providers.docker.exposedByDefault=false"
+      - "--entrypoints.websecure.address=:443"
+    ports:
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./traefik.yml:/traefik.yml"
+    labels:
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+    networks:
+      - app-network
+  websecure:
+    build: ./frontend
+    labels:
+      - "traefik.enable=true"
+      # Router for login.html without authentication
+      - "traefik.http.routers.web-secure.rule=Host(`${HOST}`)"
+      - "traefik.http.routers.web-secure.entrypoints=websecure"
+      - "traefik.http.services.web-secure.loadbalancer.server.port=80"
+        #- "traefik.http.routers.web-secure.tls.certresolver=myresolver"
+    networks:
+      - app-network
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+
+  backend:
+    build: ./backend
+    environment:
+      STORAGE: ${STORAGE}
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`${HOST}`) && PathPrefix(`/api`)"
+      - "traefik.http.services.backend.loadbalancer.server.port=3000"
+    volumes:
+      - ./backend:/app
+    networks:
+      - app-network
+
+  mysql:
+    image: mysql:8.2.0
+    environment:
+      STORAGE: ${STORAGE}
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+volumes:
+  mysql-data:
+networks:
+  app-network:
+    driver: bridge

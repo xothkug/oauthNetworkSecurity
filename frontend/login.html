@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Page Title</title>
+
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+      rel="stylesheet"
+    />
+    <link href="style.css" rel="stylesheet" />
+
+    <script src="https://accounts.google.com/gsi/client" async></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="navbar.js"></script>
+  </head>
+  <body class="hero-anime">
+    <nav>
+      <div class="navigation-wrap bg-light start-header start-style">
+        <div class="container">
+          <div class="row">
+            <div class="col-12">
+              <nav class="navbar navbar-expand-md navbar-light">
+                <a class="navbar-brand" href="index.html"
+                  ><img src="logo.png" alt=""
+                /></a>
+                <p>s140291</p>
+                <button
+                  class="navbar-toggler"
+                  type="button"
+                  data-toggle="collapse"
+                  data-target="#navbarSupportedContent"
+                  aria-controls="navbarSupportedContent"
+                  aria-expanded="false"
+                  aria-label="Toggle navigation"
+                >
+                  <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div
+                  class="collapse navbar-collapse"
+                  id="navbarSupportedContent"
+                >
+                  <ul class="navbar-nav ml-auto py-4 py-md-0">
+                    <li class="nav-item pl-4 pl-md-0 ml-0 ml-md-4">
+                      <a class="nav-link" href="index.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item pl-4 pl-md-0 ml-0 ml-md-4 active">
+                      <a class="nav-link" href="login.html">Login</a>
+                    </li>
+                    <li class="nav-item pl-4 pl-md-0 ml-0 ml-md-4">
+                      <a class="nav-link" href="register.html">Register</a>
+                    </li>
+                  </ul>
+                </div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="section full-height">
+      <div class="container dashboard">
+        <h2 class="login-header">Login</h2>
+        <div class="addTodo">
+          <input
+            type="email"
+            id="email"
+            placeholder="E-mail"
+            required
+            class="form-control"
+          />
+          <input
+            type="password"
+            id="password"
+            placeholder="Wachtwoord"
+            required
+            class="form-control"
+          />
+          <button onclick="login()" class="addBtn">Login</button>
+          <div id="message" class="message"></div>
+          <button onclick="getOauthUrl()" class="addBtn">
+            OAuth With Google
+          </button>
+        </div>
+        <div
+          id="g_id_onload"
+          data-client_id="591413358132-nm84823j9vc27htl3h183io3ibcicrpi.apps.googleusercontent.com"
+          data-context="signin"
+          data-ux_mode="popup"
+          data-login_uri="https://localhost/api/oauth/google"
+          data-auto_select="false"
+          data-itp_support="true"
+          data-auto_prompt="true"
+        ></div>
+        <div
+          class="g_id_signin"
+          data-type="standard"
+          data-shape="rectangular"
+          data-theme="outline"
+          data-text="signin_with"
+          data-size="large"
+          data-logo_alignment="left"
+        ></div>
+        <h1>Library Implementation</h1>
+        
+          <button onclick="getOauthUrlLibrary()" class="addBtn">
+            OAuth With Google
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+<script>
+  function login() {
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/api/login", true);
+    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        document.getElementById("message").innerText = "Login succesvol!";
+      } else if (xhr.readyState === 4) {
+        document.getElementById("message").innerText = "Login mislukt.";
+      }
+    };
+    var data = JSON.stringify({
+      email: document.getElementById("email").value,
+      password: document.getElementById("password").value,
+    });
+    xhr.send(data);
+  }
+
+  function getOauthUrl() {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/api/oauth/getUrl", true);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        // Log the entire response object for debugging
+        console.log(xhr);
+
+        if (xhr.status === 200) {
+          // You can also log just the response text
+          console.log("Response from API:", xhr.responseText);
+          window.location.href = xhr.responseText;
+        } else {
+          document.getElementById("message").innerText =
+            "Failed to get OAuth URL";
+        }
+      }
+    };
+    xhr.send();
+  }
+
+  function getOauthUrlLibrary() {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/api/oauth/getUrlLibrary", true);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        // Log the entire response object for debugging
+        console.log(xhr);
+
+        if (xhr.status === 200) {
+          // You can also log just the response text
+          console.log("Response from API:", xhr.responseText);
+          window.location.href = xhr.responseText;
+        } else {
+          document.getElementById("message").innerText =
+            "Failed to get OAuth URL";
+        }
+      }
+    };
+    xhr.send();
+  }
+</script>
