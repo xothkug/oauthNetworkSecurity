@@ -1,8 +1,8 @@
 const { google } = require("googleapis");
 
 const oauth2Client = new google.auth.OAuth2(
-  "591413358132-nm84823j9vc27htl3h183io3ibcicrpi.apps.googleusercontent.com",
-  "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",
+  process.env.GOOGLE_CLIENTID,
+  process.env.GOOGLE_SECRET,
   "https://localhost/api/oauth/googleLibrary"
 );
 

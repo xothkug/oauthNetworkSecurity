@@ -79,9 +79,8 @@ async function getGoogleOAuthTokes({ code }) {
   const url = "https://oauth2.googleapis.com/token";
   const values = {
     code,
-    client_id:
-      "591413358132-nm84823j9vc27htl3h183io3ibcicrpi.apps.googleusercontent.com",
-    client_secret: "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",
+    client_id: process.env.GOOGLE_CLIENTID,
+    client_secret: process.env.GOOGLE_SECRET,
     redirect_uri: "https://localhost/api/oauth/google",
     grant_type: "authorization_code",
   };
